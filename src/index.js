@@ -6,13 +6,13 @@ var tweenState = require('react-tween-state');
 var {
   StyleSheet,
   TouchableHighlight,
+  Animated,
+  Easing,
   View,
   Text
 } = React;
 
 var Accordion = React.createClass({
-  mixins: [tweenState.Mixin],
-
   propTypes: {
     activeOpacity: React.PropTypes.number,
     animationDuration: React.PropTypes.number,
@@ -30,14 +30,14 @@ var Accordion = React.createClass({
       animationDuration: 300,
       easing: 'linear',
       underlayColor: '#000',
-      style: {}
+      style: {},
     };
   },
 
   getInitialState() {
     return {
       is_visible: false,
-      height: 0,
+      height: new Animated.Value(0),
       content_height: 0
     };
   },
@@ -53,11 +53,11 @@ var Accordion = React.createClass({
   toggle() {
     this.state.is_visible = !this.state.is_visible;
 
-    this.tweenState('height', {
-      easing: tweenState.easingTypes[this.props.easing],
-      duration: this.props.animationDuration,
-      endValue: this.state.height === 0 ? this.state.content_height : 0
-    });
+    Animated.timing(this.state.height, {
+      easing: Easing.inOut(Easing.quad),
+      duration: 300,
+      toValue: this.state.is_visible ? this.state.content_height : 0,
+    }).start();
   },
 
   _onPress() {
@@ -87,11 +87,7 @@ var Accordion = React.createClass({
   render() {
     return (
       /*jshint ignore:start */
-      <View
-        style={{
-          overflow: 'hidden'
-        }}
-      >
+      <View style={{ overflow: 'hidden'}}>
         <TouchableHighlight
           ref="AccordionHeader"
           onPress={this._onPress}
@@ -100,16 +96,14 @@ var Accordion = React.createClass({
         >
           {this.props.header}
         </TouchableHighlight>
-        <View
+        <Animated.View
           ref="AccordionContentWrapper"
-          style={{
-            height: this.getTweeningValue('height')
-          }}
+          style={{ height: this.state.height, overflow: 'hidden' }}
         >
           <View ref="AccordionContent">
             {this.props.content}
           </View>
-        </View>
+        </Animated.View>
       </View>
       /*jshint ignore:end */
     );
