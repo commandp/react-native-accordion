@@ -21,7 +21,7 @@ var Accordion = React.createClass({
     header: React.PropTypes.element.isRequired,
     onPress: React.PropTypes.func,
     underlayColor: React.PropTypes.string,
-    style: React.PropTypes.object
+    style: TouchableHighlight.propTypes.style
   },
 
   getDefaultProps() {
